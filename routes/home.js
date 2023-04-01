@@ -21,10 +21,10 @@ router.get("/category/:id/update", categoryController.category_update_get);
 
 router.post("/category/:id/update", categoryController.category_update_post);
 
-// Get list of all categories
+// Get list of all Categories
 router.get("/categories", categoryController.category_list);
 
-// Get category detail
+// Get Category detail
 router.get("/category/:id", categoryController.category_detail);
 
 /// ITEM ///
@@ -41,10 +41,10 @@ router.get("/item/:id/update", itemController.item_update_get);
 
 router.post("/item/:id/update", itemController.item_update_post);
 
-// Get list of all categories
+// Get list of all Categories
 router.get("/categories", itemController.item_list);
 
-// Get item detail
+// Get Item detail
 router.get("/item/:id", itemController.item_detail);
 
 module.exports = router;
