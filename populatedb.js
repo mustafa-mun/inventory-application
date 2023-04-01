@@ -6,7 +6,6 @@ const userArgs = process.argv.slice(2);
 const Category = require("./models/category");
 const Item = require("./models/item");
 
-const items = [];
 const categories = [];
 
 const mongoose = require("mongoose");
@@ -14,8 +13,7 @@ mongoose.set("strictQuery", false); // Prepare for Mongoose 7
 
 const mongoDB = userArgs[0];
 
-main().catch((err) => console.log(err));
-
+// Connect to mongoDB database and create data's
 async function main() {
   try {
     console.log("Debug: About to connect");
@@ -30,17 +28,21 @@ async function main() {
   }
 }
 
+main().catch((err) => console.log(err));
+
+// Creating category collection and document
 async function categoryCreate(name) {
   try {
     const category = new Category({ name: name });
     await category.save();
+    // Save categories in order to use them on items
     categories.push(category);
     console.log(`Added category: ${name}`);
   } catch (error) {
     console.log(error);
   }
 }
-
+// Creating item collection and document
 async function itemCreate(
   name,
   description,
@@ -59,13 +61,12 @@ async function itemCreate(
 
     const item = new Item(itemdetail);
     await item.save();
-    items.push(item);
     console.log(`Added item: ${name}`);
   } catch (error) {
     console.log(error);
   }
 }
-
+// Populate Category collection
 async function createCategories() {
   console.log("Adding categories");
   await Promise.all([
@@ -75,7 +76,7 @@ async function createCategories() {
     categoryCreate("Cardio"),
   ]);
 }
-
+// Populate Item collection
 async function createItems() {
   console.log("Adding items");
   await Promise.all([
