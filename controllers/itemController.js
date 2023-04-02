@@ -1,8 +1,23 @@
+const { collection } = require("../models/item");
 const Item = require("../models/item");
 
 // Display list of all books.
-exports.item_list = (req, res) => {
-  res.send("NOT IMPLEMENTED: Item list");
+exports.item_list = (req, res, next) => {
+  async function getItems() {
+    try {
+      const items = await Item.find({});
+      return items;
+    } catch (error) {
+      return next(error)
+    }
+  }
+  getItems()
+  .then(results => {
+    res.render("item_list", {
+      title: "All Items",
+      collection: results
+    })
+  })
 };
 
 exports.item_detail = (req, res) => {

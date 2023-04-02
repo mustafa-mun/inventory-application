@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  div.home-section 
+    h1= title
+    ul
+      each category in collection
+        li
+          a(href=`${category.url}`) #{category.name}
