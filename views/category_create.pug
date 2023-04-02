@@ -1,0 +1,15 @@
+extends layout 
+
+block content 
+  div.home-section
+    h1= title
+    form(action='/home/category/create', method='POST')
+      div.form-div
+        label(for='name') Name:
+        input(type='text', name='name', id='name', placeholder="Strength, Cardio etc..." value=(undefined===category ? '' : category.name))
+      button(type='submit') Submit
+
+    if errors
+      ul
+        for error in errors
+          li!= error.msg

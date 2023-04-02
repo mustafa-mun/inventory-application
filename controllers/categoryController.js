@@ -1,6 +1,7 @@
 const Category = require("../models/category");
 const Item = require("../models/item");
 const async = require("async");
+const { body, validationResult } = require("express-validator");
 
 // Home page
 exports.index = (req, res, next) => {
@@ -80,12 +81,41 @@ exports.category_detail = (req, res, next) => {
 };
 
 exports.category_create_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Category create get");
+  res.render("category_create", { title: "Create Category" });
 };
 
-exports.category_create_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Category create post");
-};
+exports.category_create_post = [
+  // Validate fields
+  body("name", "Name field can't be empty!")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  (req, res, next) => {
+    // Extracts errors from request
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/errors messages
+      res.render("category_create", {
+        title: "Create Category",
+        category: req.body,
+        errors: errors.array(),
+      });
+      return; // Return after sending the first response
+    }
+    // Form data is valid
+    // Create category object with new data
+
+    const category = new Category({
+      name: req.body.name,
+    });
+    category
+      .save()
+      .then(() => res.redirect(category.url))
+      .catch((err) => next(err));
+  },
+];
+
 
 exports.category_delete_get = (req, res) => {
   res.send(`NOT IMPLEMENTED: Category delete id ${req.params.id}`);
