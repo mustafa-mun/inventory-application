@@ -1,4 +1,6 @@
 const Item = require("../models/item");
+const Category = require("../models/category");
+const { body, validationResult } = require("express-validator");
 
 // Display list of all books.
 exports.item_list = (req, res, next) => {
@@ -38,13 +40,81 @@ exports.item_detail = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-exports.item_create_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Item create get");
+exports.item_create_get = (req, res, next) => {
+  async function getCategories() {
+    try {
+      const categories = await Category.find({});
+      return categories;
+    } catch (error) {
+      return next(error);
+    }
+  }
+  getCategories().then((result) => {
+    res.render("item_create", { title: "Create Item", categories: result });
+  });
 };
 
-exports.item_create_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Item create post");
-};
+exports.item_create_post = [
+  // Validate fields
+  body("name", "Name should be at least three characters!")
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body("description", "Description field can't be empty!")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("price", "Price should be between 0.1 and 999999").isFloat({
+    min: 0.1,
+    max: 999999,
+  }),
+  body(
+    "number_in_stocks",
+    "Number in stock should be between 1 and 1000"
+  ).isFloat({ min: 1, max: 1000 }),
+  (req, res, next) => {
+    // Extracts errors from request
+    const errors = validationResult(req);
+
+    async function getCategories() {
+      try {
+        const categories = await Category.find({});
+        return categories;
+      } catch (error) {
+        return next(error);
+      }
+    }
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/errors messages
+       getCategories()
+      .then(result => {
+        res.render("item_create", {
+          title: "Create Item",
+          categories: result,
+          item: req.body,
+          errors: errors.array(),
+        });
+      })
+      return; // Return after sending the first response
+    }
+    // Form data is valid
+    // Create item object with new data
+
+
+    const item = new Item({
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      price: req.body.price,
+      number_in_stocks: req.body.number_in_stocks,
+    });
+    item
+      .save()
+      .then(() => res.redirect(item.url))
+      .catch((err) => next(err));
+  },
+];
 
 exports.item_delete_get = (req, res) => {
   res.send(`NOT IMPLEMENTED: Item delete id ${req.params.id}`);
