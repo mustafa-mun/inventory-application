@@ -1,0 +1,10 @@
+extends layout 
+
+block content 
+  div.home-section
+    h1 Item Detail: #{item.name} 
+    p Item Description: #{item.description}
+    p Item Category: 
+      a(href=`${item.category.url}`) #{item.category.name}
+    p Item Price: $#{item.price}
+    p Item Number-In-Stocks: #{item.number_in_stocks}
