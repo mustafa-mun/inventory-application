@@ -55,6 +55,7 @@ button {
   width: 25%;
 }
 
+select,
 input {
   margin: 20px;
 }
