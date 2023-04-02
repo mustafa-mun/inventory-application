@@ -43,3 +43,18 @@ aside {
 li {
   font-size: 19px;
 }
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  height: 30px;
+  width: 25%;
+}
+
+input {
+  margin: 20px;
+}
