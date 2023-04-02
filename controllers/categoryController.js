@@ -4,9 +4,11 @@ const async = require("async");
 
 // Home page
 exports.index = (req, res, next) => {
+  // Count documents
   async function countDocs(model) {
     try {
       const count = await model.countDocuments({});
+      // Return count and model name as a object for render
       return {
         count,
         name: model.modelName,
@@ -15,6 +17,7 @@ exports.index = (req, res, next) => {
       return next(error);
     }
   }
+  // Wait for all countings and render them
   Promise.all([countDocs(Item), countDocs(Category)])
     .then((results) => {
       res.render("index", { title: "Strength Dynamics", documents: results });
@@ -24,15 +27,22 @@ exports.index = (req, res, next) => {
 };
 // Display list of all books.
 exports.category_list = (req, res, next) => {
+  // Find all categories
   async function getCategories() {
     try {
       const categories = await Category.find({});
-      return categories
+      return categories;
     } catch (error) {
       return next(error);
     }
   }
-  res.render("category_list", { title: "All Categories" })
+  // After categories found, render them
+  getCategories().then((result) => {
+    res.render("category_list", {
+      title: "All Categories",
+      collection: result,
+    });
+  });
 };
 
 exports.category_detail = (req, res) => {
