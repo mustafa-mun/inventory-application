@@ -41,8 +41,8 @@ router.get("/item/:id/update", itemController.item_update_get);
 
 router.post("/item/:id/update", itemController.item_update_post);
 
-// Get list of all Categories
-router.get("/categories", itemController.item_list);
+// Get list of all items
+router.get("/items", itemController.item_list);
 
 // Get Item detail
 router.get("/item/:id", itemController.item_detail);
