@@ -45,8 +45,36 @@ exports.category_list = (req, res, next) => {
   });
 };
 
-exports.category_detail = (req, res) => {
-  res.send(`NOT IMPLEMENTED: Category detail id ${req.params.id}`);
+exports.category_detail = (req, res, next) => {
+  async function findCategory() {
+    try {
+      const category = await Category.findOne({ _id: req.params.id });
+      return category;
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async function findCategoryItems() {
+    try {
+      const items = await Item.find({ category: req.params.id });
+      return items;
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async
+    .parallel({
+      category: findCategory,
+      items: findCategoryItems,
+    })
+    .then((results) => {
+      res.render("category_detail", {
+        category: results.category,
+        item_list: results.items,
+      });
+    });
 };
 
 exports.category_create_get = (req, res) => {
