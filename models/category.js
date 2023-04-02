@@ -5,7 +5,6 @@ const CategorySchema = new Schema({
   name: {
     type: String,
     required: true,
-    enum: ["Weight&Barbells", "Strength", "Conditioning", "Cardio"],
   },
 });
 
