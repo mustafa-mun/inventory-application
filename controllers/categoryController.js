@@ -23,10 +23,9 @@ exports.index = (req, res, next) => {
     .then((results) => {
       res.render("index", { title: "Strength Dynamics", documents: results });
     })
-    .then((results) => console.log(results))
     .catch((err) => next(err));
 };
-// Display list of all books.
+// Display list of all categories.
 exports.category_list = (req, res, next) => {
   // Find all categories
   async function getCategories() {
