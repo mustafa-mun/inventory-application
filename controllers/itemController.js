@@ -19,6 +19,7 @@ exports.item_list = (req, res, next) => {
 };
 
 exports.item_detail = (req, res, next) => {
+  // Find item with url id
   async function findItem() {
     try {
       const item = await Item.findOne({ _id: req.params.id }).populate(
@@ -29,10 +30,12 @@ exports.item_detail = (req, res, next) => {
       return next(error);
     }
   }
-
-  findItem().then((result) => {
-    res.render("item_detail", { item: result });
-  });
+  // Render page with item details
+  findItem()
+    .then((result) => {
+      res.render("item_detail", { item: result });
+    })
+    .catch((err) => next(err));
 };
 
 exports.item_create_get = (req, res) => {

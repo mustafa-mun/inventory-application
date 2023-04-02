@@ -46,6 +46,7 @@ exports.category_list = (req, res, next) => {
 };
 
 exports.category_detail = (req, res, next) => {
+  // Find category with url id
   async function findCategory() {
     try {
       const category = await Category.findOne({ _id: req.params.id });
@@ -54,7 +55,7 @@ exports.category_detail = (req, res, next) => {
       return next(error);
     }
   }
-
+  // Find all items with related category
   async function findCategoryItems() {
     try {
       const items = await Item.find({ category: req.params.id });
@@ -63,7 +64,7 @@ exports.category_detail = (req, res, next) => {
       return next(error);
     }
   }
-
+  // Render Detail page with category name and all it's items
   async
     .parallel({
       category: findCategory,
@@ -74,7 +75,8 @@ exports.category_detail = (req, res, next) => {
         category: results.category,
         item_list: results.items,
       });
-    });
+    })
+    .catch((err) => next(err));
 };
 
 exports.category_create_get = (req, res) => {
