@@ -13,7 +13,7 @@ exports.item_list = (req, res, next) => {
   getItems().then((results) => {
     res.render("item_list", {
       title: "All Items",
-      collection: results,
+      item_list: results,
     });
   });
 };
@@ -21,10 +21,12 @@ exports.item_list = (req, res, next) => {
 exports.item_detail = (req, res, next) => {
   async function findItem() {
     try {
-      const item = await Item.findOne({ _id: req.params.id }).populate("category");
-      return item
+      const item = await Item.findOne({ _id: req.params.id }).populate(
+        "category"
+      );
+      return item;
     } catch (error) {
-      return next(error)
+      return next(error);
     }
   }
 

@@ -4,6 +4,6 @@ block content
   div.home-section 
     h1= title
     ul
-      each category in collection
+      each item in item_list
         li
-          a(href=`${category.url}`) #{category.name}
+          a(href=`${item.url}`) #{item.name}
