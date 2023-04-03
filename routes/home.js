@@ -39,6 +39,8 @@ router.post("/item/:id/delete", itemController.item_delete_post);
 
 router.get("/item/:id/update", itemController.item_update_get);
 
+router.post("/item/:id/update/password", itemController.item_update_handle)
+
 router.post("/item/:id/update", itemController.item_update_post);
 
 // Get list of all items
