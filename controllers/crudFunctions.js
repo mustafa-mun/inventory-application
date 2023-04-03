@@ -46,10 +46,24 @@ async function deleteDocument(model, id, next) {
   }
 }
 
+async function updateDocumentWithID(model, id, res, updated, next) {
+  try {
+    await model
+      .findByIdAndUpdate(id, updated, {})
+      .then((updatedDocument) => {
+        res.redirect(updatedDocument.url);
+      })
+      .catch((err) => next(err));
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   countDocs,
   getAllCollectionDocuments,
   findDocumentWithID,
   getRelatedDocuments,
-  deleteDocument
+  deleteDocument,
+  updateDocumentWithID
 };
