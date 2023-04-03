@@ -3,11 +3,7 @@ extends layout
 block content 
   div.home-section
     h1= title
-<<<<<<< HEAD
     form(action=undefined===category ? '' : `/home/category/${category._id}/update`, method='POST')
-=======
-    form(action='/home/category/create', method='POST')
->>>>>>> origin/main
       div.form-div
         label(for='name') Name:
         input(type='text', name='name', id='name', placeholder="Strength, Cardio etc..." value=(undefined===category ? '' : category.name))

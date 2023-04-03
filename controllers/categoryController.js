@@ -63,7 +63,7 @@ exports.category_create_post = [
     if (!errors.isEmpty()) {
       // There are errors. Render the form again with sanitized values/errors messages
       res.render("category_create", {
-        title: "Update Item",
+        title: "Create Category",
         category: req.body.category,
         errors: errors.array(),
       });
