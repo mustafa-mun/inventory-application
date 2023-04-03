@@ -87,20 +87,18 @@ exports.item_create_post = [
 
     if (!errors.isEmpty()) {
       // There are errors. Render the form again with sanitized values/errors messages
-       getCategories()
-      .then(result => {
+      getCategories().then((result) => {
         res.render("item_create", {
           title: "Create Item",
           categories: result,
           item: req.body,
           errors: errors.array(),
         });
-      })
+      });
       return; // Return after sending the first response
     }
     // Form data is valid
     // Create item object with new data
-
 
     const item = new Item({
       name: req.body.name,
@@ -116,13 +114,60 @@ exports.item_create_post = [
   },
 ];
 
-exports.item_delete_get = (req, res) => {
-  res.send(`NOT IMPLEMENTED: Item delete id ${req.params.id}`);
+exports.item_delete_get = (req, res, next) => {
+  async function findItem() {
+    try {
+      const item = await Item.findOne({ _id: req.params.id });
+      return item;
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  findItem()
+    .then((result) => {
+      res.render("item_delete", { item: result });
+    })
+    .catch((err) => next(err));
 };
 
-exports.item_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Item delete post");
-};
+exports.item_delete_post = [
+  // Check if admin password is correct
+  body("password", "Admin password is not correct!").equals(
+    process.env.ADMIN_PASSWORD
+  ),
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // There are errors
+      async function findItem() {
+        try {
+          const item = await Item.findOne({ _id: req.params.id });
+          return item;
+        } catch (error) {
+          return next(error);
+        }
+      }
+
+      findItem()
+        .then((result) => {
+          res.render("item_delete", { item: result, errors: errors.array() });
+        })
+        .catch((err) => next(err));
+    } else {
+      // Data is valid, delete the item and redirect to items page.
+      async function deleteItem() {
+        try {
+          await Item.findByIdAndDelete(req.params.id);
+        } catch (error) {
+          return next(error);
+        }
+      }
+      deleteItem().then(() => res.redirect("/home/items"));
+    }
+  },
+];
 
 exports.item_update_get = (req, res) => {
   res.send(`NOT IMPLEMENTED: Item update id ${req.params.id}`);
