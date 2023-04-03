@@ -1,18 +1,13 @@
 const Item = require("../models/item");
 const Category = require("../models/category");
+const crudFunction = require("./crudFunctions");
 const { body, validationResult } = require("express-validator");
 
 // Display list of all books.
 exports.item_list = (req, res, next) => {
-  async function getItems() {
-    try {
-      const items = await Item.find({});
-      return items;
-    } catch (error) {
-      return next(error);
-    }
-  }
-  getItems().then((results) => {
+  // Find all items
+  // After items found, render them
+  crudFunction.getAllCollectionDocuments(Item, next).then((results) => {
     res.render("item_list", {
       title: "All Items",
       item_list: results,
@@ -24,6 +19,7 @@ exports.item_detail = (req, res, next) => {
   // Find item with url id
   async function findItem() {
     try {
+      // Populating the category field so we can use it
       const item = await Item.findOne({ _id: req.params.id }).populate(
         "category"
       );
@@ -41,15 +37,8 @@ exports.item_detail = (req, res, next) => {
 };
 
 exports.item_create_get = (req, res, next) => {
-  async function getCategories() {
-    try {
-      const categories = await Category.find({});
-      return categories;
-    } catch (error) {
-      return next(error);
-    }
-  }
-  getCategories().then((result) => {
+  // Get all categories for select input and render create form page
+  crudFunction.getAllCollectionDocuments(Category, next).then((result) => {
     res.render("item_create", { title: "Create Item", categories: result });
   });
 };
@@ -76,18 +65,11 @@ exports.item_create_post = [
     // Extracts errors from request
     const errors = validationResult(req);
 
-    async function getCategories() {
-      try {
-        const categories = await Category.find({});
-        return categories;
-      } catch (error) {
-        return next(error);
-      }
-    }
-
     if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/errors messages
-      getCategories().then((result) => {
+      // There are errors.
+      // Get all Category documents
+      crudFunction.getAllCollectionDocuments(Category, next).then((result) => {
+        // Render the form again with sanitized values/errors messages
         res.render("item_create", {
           title: "Create Item",
           categories: result,
@@ -115,16 +97,9 @@ exports.item_create_post = [
 ];
 
 exports.item_delete_get = (req, res, next) => {
-  async function findItem() {
-    try {
-      const item = await Item.findOne({ _id: req.params.id });
-      return item;
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-  findItem()
+  // Find item with url id
+  crudFunction
+    .findDocumentWithID(Item, req.params.id, next)
     .then((result) => {
       res.render("item_delete", { item: result });
     })
@@ -141,30 +116,18 @@ exports.item_delete_post = [
 
     if (!errors.isEmpty()) {
       // There are errors
-      async function findItem() {
-        try {
-          const item = await Item.findOne({ _id: req.params.id });
-          return item;
-        } catch (error) {
-          return next(error);
-        }
-      }
-
-      findItem()
+      // Render the delete form again with errors
+      crudFunction
+        .findDocumentWithID(Item, req.params.id, next)
         .then((result) => {
           res.render("item_delete", { item: result, errors: errors.array() });
         })
         .catch((err) => next(err));
     } else {
       // Data is valid, delete the item and redirect to items page.
-      async function deleteItem() {
-        try {
-          await Item.findByIdAndDelete(req.params.id);
-        } catch (error) {
-          return next(error);
-        }
-      }
-      deleteItem().then(() => res.redirect("/home/items"));
+      crudFunction
+        .deleteDocument(Item, req.params.id, next)
+        .then(() => res.redirect("/home/items"));
     }
   },
 ];
