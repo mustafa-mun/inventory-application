@@ -1,25 +1,16 @@
 const Category = require("../models/category");
 const Item = require("../models/item");
-const async = require("async");
+const crudFunction = require("./crudFunctions");
 const { body, validationResult } = require("express-validator");
 
 // Home page
 exports.index = (req, res, next) => {
   // Count documents
-  async function countDocs(model) {
-    try {
-      const count = await model.countDocuments({});
-      // Return count and model name as a object for render
-      return {
-        count,
-        name: model.modelName,
-      };
-    } catch (error) {
-      return next(error);
-    }
-  }
   // Wait for all countings and render them
-  Promise.all([countDocs(Item), countDocs(Category)])
+  Promise.all([
+    crudFunction.countDocs(Item, next),
+    crudFunction.countDocs(Category, next),
+  ])
     .then((results) => {
       res.render("index", { title: "Strength Dynamics", documents: results });
     })
@@ -28,16 +19,8 @@ exports.index = (req, res, next) => {
 // Display list of all categories.
 exports.category_list = (req, res, next) => {
   // Find all categories
-  async function getCategories() {
-    try {
-      const categories = await Category.find({});
-      return categories;
-    } catch (error) {
-      return next(error);
-    }
-  }
   // After categories found, render them
-  getCategories().then((result) => {
+  crudFunction.getAllCollectionDocuments(Category, next).then((result) => {
     res.render("category_list", {
       title: "All Categories",
       collection: result,
@@ -47,39 +30,23 @@ exports.category_list = (req, res, next) => {
 
 exports.category_detail = (req, res, next) => {
   // Find category with url id
-  async function findCategory() {
-    try {
-      const category = await Category.findOne({ _id: req.params.id });
-      return category;
-    } catch (error) {
-      return next(error);
-    }
-  }
   // Find all items with related category
-  async function findCategoryItems() {
-    try {
-      const items = await Item.find({ category: req.params.id });
-      return items;
-    } catch (error) {
-      return next(error);
-    }
-  }
   // Render Detail page with category name and all it's items
-  async
-    .parallel({
-      category: findCategory,
-      items: findCategoryItems,
-    })
+  Promise.all([
+    crudFunction.findDocumentWithID(Category, req.params.id, next),
+    crudFunction.getRelatedDocuments(Item, "category", req.params.id, next),
+  ])
     .then((results) => {
       res.render("category_detail", {
-        category: results.category,
-        item_list: results.items,
+        category: results[0],
+        item_list: results[1],
       });
     })
     .catch((err) => next(err));
 };
 
 exports.category_create_get = (req, res) => {
+  // Render create category
   res.render("category_create", { title: "Create Category" });
 };
 
@@ -115,14 +82,54 @@ exports.category_create_post = [
   },
 ];
 
-
-exports.category_delete_get = (req, res) => {
-  res.send(`NOT IMPLEMENTED: Category delete id ${req.params.id}`);
+exports.category_delete_get = (req, res, next) => {
+  // Find all items with related category
+  // Render delete page with category name and all it's items
+  Promise.all([
+    crudFunction.findDocumentWithID(Category, req.params.id, next),
+    crudFunction.getRelatedDocuments(Item, "category", req.params.id, next),
+  ])
+    .then((results) => {
+      res.render("category_delete", {
+        category: results[0],
+        category_items: results[1],
+      });
+    })
+    .catch((err) => next(err));
 };
 
-exports.category_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Category delete post");
-};
+exports.category_delete_post = [
+  // Check if admin password is correct
+  body("password", "Admin password is not correct!").equals(
+    process.env.ADMIN_PASSWORD
+  ),
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // There are errors
+      // Render delete page with errors
+      Promise.all([
+        crudFunction.findDocumentWithID(Category, req.params.id, next),
+        crudFunction.getRelatedDocuments(Item, Category, req.params.id, next),
+      ])
+        .then((results) => {
+          res.render("category_delete", {
+            category: results[0],
+            category_items: results[1],
+            errors: errors.array(),
+          });
+        })
+        .catch((err) => next(err));
+    } else {
+      // Password is correct, delete the category and redirect to categories page
+      crudFunction
+        .deleteDocument(Category, req.params.id, next)
+        .then(() => res.redirect("/home/categories"))
+        .catch((err) => next(err));
+    }
+  },
+];
 
 exports.category_update_get = (req, res) => {
   res.send(`NOT IMPLEMENTED: Category update id ${req.params.id}`);
