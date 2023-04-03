@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  div.home-section 
+    h1= title
+    p Welcome to #{title}, basic Express Website developed for #[a(href="https://www.theodinproject.com/lessons/nodejs-inventory-application/") The Odin Project]
+    h1 Inventory Count:
+      ul
+        each item in documents
+          li= item.name + ': ' + item.count
+
+

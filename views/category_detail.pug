@@ -1,0 +1,18 @@
+extends layout 
+
+block content 
+  div.home-section
+    h1 Category detail: #{category.name}
+    h2 Items:
+    if item_list.length
+      ul
+        each item in item_list
+          li
+            a(href=`${item.url}`) #{item.name}
+    else 
+     p No items
+    hr
+    p
+      a(href=category.url+'/delete') Delete category
+    p
+      a(href=category.url+'/update') Update category

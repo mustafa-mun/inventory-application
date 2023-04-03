@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    aside
+      a.test(href="/home") Home
+      a(href="/home/categories") All Categories
+      a(href="/home/items") All Items
+      div.aside-seperate
+      a(href="/home/category/create") Create Category
+      a(href="/home/item/create") Create Item
+  block content
