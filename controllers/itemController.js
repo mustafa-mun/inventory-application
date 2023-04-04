@@ -31,7 +31,10 @@ exports.item_detail = (req, res, next) => {
   // Render page with item details
   findItem()
     .then((result) => {
-      res.render("item_detail", { item: result, title: "Item detail: " + result.name });
+      res.render("item_detail", {
+        item: result,
+        title: "Item detail: " + result.name,
+      });
     })
     .catch((err) => next(err));
 };
@@ -72,8 +75,9 @@ exports.item_create_post = [
         // Render the form again with sanitized values/errors messages
         res.render("item_create", {
           title: "Create Item",
+          model: "item",
           categories: result,
-          item: req.body,
+          item: req.body.item,
           errors: errors.array(),
         });
       });
