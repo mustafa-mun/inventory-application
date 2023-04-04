@@ -21,7 +21,7 @@ router.get("/category/:id/update", categoryController.category_update_get);
 
 router.post(
   "/category/:id/update/password",
-  categoryController.category_update_handle
+  categoryController.category_update_password_handle
 );
 
 router.post("/category/:id/update", categoryController.category_update_post);
@@ -44,7 +44,10 @@ router.post("/item/:id/delete", itemController.item_delete_post);
 
 router.get("/item/:id/update", itemController.item_update_get);
 
-router.post("/item/:id/update/password", itemController.item_update_handle);
+router.post(
+  "/item/:id/update/password",
+  itemController.item_update_password_handle
+);
 
 router.post("/item/:id/update", itemController.item_update_post);
 

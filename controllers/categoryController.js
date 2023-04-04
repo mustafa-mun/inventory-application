@@ -144,7 +144,7 @@ exports.category_update_get = (req, res, next) => {
     ]);
 };
 
-exports.category_update_handle = [
+exports.category_update_password_handle = [
   // Check if password is correct
   body("password", "Admin password is not correct!").equals(
     process.env.ADMIN_PASSWORD

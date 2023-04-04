@@ -143,7 +143,7 @@ exports.item_update_get = (req, res, next) => {
   ]);
 };
 
-exports.item_update_handle = [
+exports.item_update_password_handle = [
   // Check if passwor is correct
   body("password", "Admin password is not correct!").equals(
     process.env.ADMIN_PASSWORD
