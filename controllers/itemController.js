@@ -158,6 +158,7 @@ exports.item_update_handle = [
         .then((result) => {
           res.render("password", {
             title: "Enter Admin Password!",
+            model: "item",
             item: result,
             errors: errors.array(),
           });
@@ -172,6 +173,7 @@ exports.item_update_handle = [
       ]).then((results) => {
         res.render("item_create", {
           title: "Update Item",
+          model: "item",
           item: results[0],
           categories: results[1],
         });
@@ -205,12 +207,17 @@ exports.item_update_post = [
     if (!errors.isEmpty()) {
       // There are errors.
       // Get all Category documents
-      crudFunction.getAllCollectionDocuments(Category, next).then((result) => {
-        // Render the form again with sanitized values/errors messages
+      Promise.all([
+        // Find category with url id (This step is for filling input fields with current item data)
+        crudFunction.findDocumentWithID(Item, req.params.id, next),
+        // Get all categories for select input
+        crudFunction.getAllCollectionDocuments(Category, next),
+      ]).then((results) => {
         res.render("item_create", {
-          title: "Create Item",
-          categories: result,
-          item: req.body,
+          title: "Update Item",
+          model: "item",
+          item: results[0],
+          categories: results[1],
           errors: errors.array(),
         });
       });
