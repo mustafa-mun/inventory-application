@@ -1,0 +1,15 @@
+extends layout 
+
+block content 
+  div.home-section
+    h1= title
+    form(action=`/home/item/${item._id}/delete`, method='POST')
+      div.form-div
+        label(for='password') Password:
+        input(type='text', name='password', id='password', placeholder="Admin Password")
+      button(type='submit') Delete
+  
+    if errors
+        ul
+          for error in errors
+            li!= error.msg

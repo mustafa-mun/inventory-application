@@ -1,0 +1,30 @@
+extends layout 
+
+block content
+  div.home-section
+    h1= title
+    form(action=undefined===item ? '' : `/home/item/${item._id}/update`, method='POST')
+      div.form-div
+        label(for='name') Name:
+        input(type='text', name='name', id='name', placeholder="Squat Rack, Bandages,  etc..." value=(undefined===item ? '' : item.name))
+      div.form-div
+        label(for='description') Description:
+        input(type='text', name='description', id='description', placeholder="Item Description..." value=(undefined===item ? '' : item.description))
+      div.form-div
+        label(for="category") Category:
+        select(name="category")
+          if categories          
+            each category in categories
+              option(value=category._id, selected=(currentCategoryID && currentCategoryID.toString() === category._id.toString())) #{category.name} 
+      div.form-div
+        label(for='price') Price:
+        input(type='number', name='price', id='price', placeholder="Item price..." value=(undefined===item ? '' : item.price)) 
+      div.form-div
+        label(for='description') number_in_stock:
+        input(type='number', name='number_in_stocks', id='number_in_stocks', placeholder="Number_in_Stock..." value=(undefined===item ? '' : item.number_in_stocks)) 
+      button(type='submit') Submit
+      
+    if errors
+      ul
+        for error in errors
+          li!= error.msg  
